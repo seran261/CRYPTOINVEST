@@ -1,5 +1,5 @@
 from scanner import fetch_top_symbols, scan_symbol
-from telegram import send_signal
+from telegram_utils import send_signal
 from config import TIMEFRAMES, TOP_COINS_LIMIT
 import time
 
@@ -16,4 +16,4 @@ while True:
             except Exception as e:
                 print(symbol, e)
 
-    time.sleep(3600)  # scan every hour
+    time.sleep(3600)
