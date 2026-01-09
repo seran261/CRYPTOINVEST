@@ -1,6 +1,6 @@
 import asyncio
 from scanner_async import fetch_top_symbols, scan_symbol
-from telegram_utils import send_signal
+from telegram_utils import send_signal, app
 from tracker import add_trade
 from price_watcher import monitor_trades
 from config import TIMEFRAMES, TOP_COINS_LIMIT
@@ -17,7 +17,7 @@ async def scan_loop():
 
             for signal in results:
                 if signal:
-                    send_signal(signal)
+                    await send_signal(signal)
                     add_trade(signal)
 
         await asyncio.sleep(SCAN_INTERVAL)
@@ -25,7 +25,10 @@ async def scan_loop():
 async def main():
     await asyncio.gather(
         scan_loop(),
-        monitor_trades()
+        monitor_trades(),
+        app.initialize(),
+        app.start(),
+        app.bot.initialize()
     )
 
 if __name__ == "__main__":
