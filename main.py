@@ -1,8 +1,9 @@
 import asyncio
 from scanner_async import fetch_top_symbols, scan_symbol
-from telegram_utils import send_signal, app
+from signal_sender import send_signal
 from tracker import add_trade
 from price_watcher import monitor_trades
+from telegram_utils import build_app
 from config import TIMEFRAMES, TOP_COINS_LIMIT
 
 SCAN_INTERVAL = 3600
@@ -22,14 +23,23 @@ async def scan_loop():
 
         await asyncio.sleep(SCAN_INTERVAL)
 
-async def main():
+
+async def async_tasks():
     await asyncio.gather(
         scan_loop(),
-        monitor_trades(),
-        app.initialize(),
-        app.start(),
-        app.bot.initialize()
+        monitor_trades()
     )
 
+
+def main():
+    app = build_app()
+
+    # Start async tasks inside Telegram event loop
+    app.create_task(async_tasks())
+
+    # ✅ SAFE polling (no Updater bug)
+    app.run_polling()
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
