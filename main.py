@@ -8,6 +8,9 @@ from config import TIMEFRAMES, TOP_COINS_LIMIT
 
 SCAN_INTERVAL = 3600
 
+
+# ---------- BACKGROUND ASYNC TASKS ----------
+
 async def scan_loop():
     symbols = await fetch_top_symbols(TOP_COINS_LIMIT)
 
@@ -31,13 +34,21 @@ async def async_tasks():
     )
 
 
+# ---------- TELEGRAM POST-INIT HOOK ----------
+
+async def post_init(app):
+    app.create_task(async_tasks())
+
+
+# ---------- MAIN ENTRY ----------
+
 def main():
     app = build_app()
 
-    # Start async tasks inside Telegram event loop
-    app.create_task(async_tasks())
+    # ✅ THIS IS THE FIX
+    app.post_init = post_init
 
-    # ✅ SAFE polling (no Updater bug)
+    # ✅ Starts event loop safely
     app.run_polling()
 
 
