@@ -9,8 +9,6 @@ from config import TIMEFRAMES, TOP_COINS_LIMIT
 SCAN_INTERVAL = 3600
 
 
-# ---------- BACKGROUND TASKS ----------
-
 async def scan_loop():
     symbols = await fetch_top_symbols(TOP_COINS_LIMIT)
 
@@ -27,23 +25,18 @@ async def scan_loop():
         await asyncio.sleep(SCAN_INTERVAL)
 
 
-async def async_tasks():
-    await asyncio.gather(
-        scan_loop(),
-        monitor_trades()
-    )
+async def start_background_tasks(app):
+    # ✅ event loop is NOW running
+    asyncio.create_task(scan_loop())
+    asyncio.create_task(monitor_trades())
 
-
-# ---------- POST INIT HOOK ----------
-
-async def post_init(application):
-    application.create_task(async_tasks())
-
-
-# ---------- MAIN ----------
 
 def main():
-    app = build_app(post_init=post_init)
+    app = build_app()
+
+    # 🔥 THIS is the key fix
+    app.post_init = start_background_tasks
+
     app.run_polling()
 
 
