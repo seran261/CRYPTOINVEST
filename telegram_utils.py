@@ -15,11 +15,7 @@ async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(msg, parse_mode="Markdown")
 
 
-def build_app(post_init=None):
-    builder = ApplicationBuilder().token(TELEGRAM_TOKEN)
-    if post_init:
-        builder.post_init(post_init)
-
-    app = builder.build()
+def build_app():
+    app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     app.add_handler(CommandHandler("stats", stats_command))
     return app
