@@ -9,7 +9,7 @@ from config import TIMEFRAMES, TOP_COINS_LIMIT
 SCAN_INTERVAL = 3600
 
 
-# ---------- BACKGROUND ASYNC TASKS ----------
+# ---------- BACKGROUND TASKS ----------
 
 async def scan_loop():
     symbols = await fetch_top_symbols(TOP_COINS_LIMIT)
@@ -34,21 +34,16 @@ async def async_tasks():
     )
 
 
-# ---------- TELEGRAM POST-INIT HOOK ----------
+# ---------- POST INIT HOOK ----------
 
-async def post_init(app):
-    app.create_task(async_tasks())
+async def post_init(application):
+    application.create_task(async_tasks())
 
 
-# ---------- MAIN ENTRY ----------
+# ---------- MAIN ----------
 
 def main():
-    app = build_app()
-
-    # ✅ THIS IS THE FIX
-    app.post_init = post_init
-
-    # ✅ Starts event loop safely
+    app = build_app(post_init=post_init)
     app.run_polling()
 
 
