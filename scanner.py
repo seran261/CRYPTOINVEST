@@ -8,6 +8,15 @@ from risk import calculate_targets
 
 exchange = ccxt.binance()
 
+def fetch_top_symbols(limit=200):
+    markets = exchange.load_markets()
+    usdt_pairs = [
+        s for s in markets
+        if s.endswith("/USDT") and markets[s]["active"]
+    ]
+    return usdt_pairs[:limit]
+
+
 def scan_symbol(symbol, timeframe):
     df = pd.DataFrame(
         exchange.fetch_ohlcv(symbol, timeframe, limit=200),
