@@ -17,4 +17,8 @@ def send_signal(data):
 
 📈 Strategy: Breakout + Retest
 """
-    bot.send_message(chat_id=CHAT_ID, text=msg, parse_mode="Markdown")
+    bot.send_message(
+        chat_id=CHAT_ID,
+        text=msg,
+        parse_mode="Markdown"
+    )
